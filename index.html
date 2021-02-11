@@ -1,5 +1,7 @@
 <html>
+
 <head>
+  <title>COMP4302 Assignment 2</title>
   <script id="vertex-shader" type="x-shader/x-vertex">
     attribute vec2 vPosition;
     
@@ -15,73 +17,74 @@
         gl_FragColor = vec4(0.274, 0.509, 0.705, 1.0);
     }
     </script>
-    <script src="../lib/webgl_utils.js"></script>
-    <script src="./lib/initShaders.js"></script>
-    <script src="./lib/MV.js"></script>
+  <script src="../lib/webgl_utils.js"></script>
+  <script src="./lib/initShaders.js"></script>
+  <script src="./lib/MV.js"></script>
   <script type="text/javascript" src="tessellation.js"></script>
 </head>
 
 <body>
-  <h1>WebGL - Tessellation and Twist</h1>
-  <hr />
-
-  <table>
-    <tr>
-      <td style="padding-right: 10px">
-        <p>
-          <label for="shape">Select a shape</label>
+  <!-- <label for="shape">Select a shape</label>
           <br />
           <select name="shape" id="shape" style="width: 270px">
             <option value="3" selected>Triangle</option>
             <option value="4">Square</option>
             <option value="5">Pentagon</option>
             <option value="6">Hexagon</option>
-          </select>
-        </p>
+          </select> -->
+  <div>
+    <label># of Polygon sides: <span id="polygon" readonly
+        style="border:0; color:#f6931f; font-weight:bold;"></span></label>
+    <br />
+    <input id="polygon-slider" type="range" value="0" min=3 max=7 step="1">
+  </div>
 
-        <p>
-          <label for="tessellation">Tessellation:</label>
-          <input type="text" id="tessellation" readonly style="border:0; color:#f6931f; font-weight:bold;" value="0">
-          <br />
-        <div id="tessellation-slider"></div>
-        </p>
+  <div>
+    <label>Tessellation: <span id="tessellation" readonly
+        style="border:0; color:#f6931f; font-weight:bold;"></span></label>
+    <br />
+    <input id="tessellation-slider" type="range" value="0" min=0 max=5 step="1">
+  </div>
 
-        <p>
-        <div id="fill" style="width: 100%; text-align: center">
-          <input type="radio" id="fill-radio1" name="fill-radio" checked="checked"><label
-            for="fill-radio1">Solid</label>
-          <input type="radio" id="fill-radio2" name="fill-radio"><label for="fill-radio2">Gasket</label>
-          <input type="radio" id="fill-radio3" name="fill-radio"><label for="fill-radio3">Lines</label>
-          <input type="radio" id="fill-radio4" name="fill-radio"><label for="fill-radio4">Gasket Lines</label>
+  <div id="fill">
+    <input type="radio" id="fill-radio1" name="fill-radio" checked="checked"><label for="fill-radio1">Filled
+      Colored</label>
+    <input type="radio" id="fill-radio3" name="fill-radio"><label for="fill-radio3">Lines</label>
 
-        </div>
-        </p>
+  </div>
 
-        <p>
-          <label for="rotation">Rotation:</label>
-          <input type="text" id="rotation" readonly style="border:0; color:#f6931f; font-weight:bold;" value="0°">
-        <div id="rotation-slider"></div>
-        </p>
+  <div>
+    <label>Rotation:<span id="rotation" readonly style="border:0; color:#f6931f; font-weight:bold;"></span></label>
+    <br />
+    <input id="rotation-slider" type="range" value="0" min=0 max=360 step="1">
+  </div>
 
-        <p>
+
+
+  <!--  <p>
         <div id="twist" style="width: 100%; text-align: center">
           <input type="radio" id="twist-radio1" name="twist-radio" checked="checked"><label
             for="twist-radio1">Normal</label>
           <input type="radio" id="twist-radio2" name="twist-radio"><label for="twist-radio2">Twist</label>
         </div>
-        </p>
+        </p> -->
 
-      </td>
-      <td>
-        <canvas id="gl-canvas" width="256" height="256" style="border: 2px solid black">
-          Oops ... your browser doesn't support the HTML5 canvas element
-        </canvas>
-        <canvas id="gl-canvas2" width="256" height="256" style="border: 2px solid black">
-          Oops ... your browser doesn't support the HTML5 canvas element
-        </canvas>
-      </td>
-    </tr>
-  </table>
+  <div>
+    <canvas id="gl-canvas-normal" width="256" height="256" style="border: 2px solid black">
+      Oops ... your browser doesn't support the HTML5 canvas element
+    </canvas>
+    <br/>
+    <label>Simple Shapes</label>
+  </div>
+  <div>
+    <canvas id="gl-canvas-tessellated" width="256" height="256" style="border: 2px solid black">
+      Oops ... your browser doesn't support the HTML5 canvas element
+    </canvas>
+    <br/>
+    <label>Tessellated Shapes</label>
+  </div>
+
+
 </body>
 
 </html>

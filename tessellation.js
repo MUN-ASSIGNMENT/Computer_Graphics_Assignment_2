@@ -2,8 +2,7 @@
 var gl;
 var vertices;
 var points;
-var programNormal;
-var programTessellated;
+var program;
 
 var fill = 3;
 var tessellation = 0;
@@ -81,40 +80,40 @@ var vec_hexagon = [
 vertices = vec_triangle.slice(0);
 
 window.onload = init = () => {
-  let normalGl = generateCanvasNormal();
-  let tessellatedGl = generateCanvasTessellated();
-  tessellationSlider(normalGl);
-  polygonSlider(normalGl);
-  rotationSlider(normalGl);
+  generateCanvasNormal();
+  generateCanvasTessellated();
+  tessellationSlider();
+  polygonSlider();
+  rotationSlider();
 }
 
-const polygonSlider = (gl) => {
+const polygonSlider = () => {
   const slider = document.getElementById("polygon-slider");
   document.getElementById("polygon").innerHTML = "3";
   slider.addEventListener("input", () => {
     const sliderValue = slider.value === "7" ? "8" : slider.value;
     document.getElementById("polygon").innerHTML = sliderValue;
-
-  /*   switch (sliderValue) {
+    console.log(sliderValue)
+    switch (sliderValue) {
       default:
-      case "3":
-        vertices = vec_triangle.slice(0);
-        break;
-      case "4":
-        vertices = vec_square.slice(0);
-        break;
-      case "5":
-        vertices = vec_pentagon.slice(0);
-        break;
-      case "6":
-        vertices = vec_hexagon.slice(0);
-        break;
-    }
-    recalculate(gl); */
+    case "3":
+      vertices = vec_triangle.slice(0);
+      break;
+    case "4":
+      vertices = vec_square.slice(0);
+      break;
+    case "5":
+      vertices = vec_pentagon.slice(0);
+      break;
+    case "6":
+      vertices = vec_hexagon.slice(0);
+      break;
+  } 
+  recalculate();
   })
 }
 
-const tessellationSlider = (gl) => {
+const tessellationSlider = () => {
   const slider = document.getElementById("tessellation-slider");
   document.getElementById("tessellation").innerHTML = "0";
   slider.addEventListener("input", () => {
@@ -124,7 +123,7 @@ const tessellationSlider = (gl) => {
   })
 }
 
-const rotationSlider = (gl) => {
+const rotationSlider = () => {
   const slider = document.getElementById("rotation-slider");
   document.getElementById("rotation").innerHTML = "0";
   slider.addEventListener("input", () => {
@@ -150,21 +149,20 @@ const generateCanvasNormal = () => {
   gl.clearColor(0.0, 0.0, 0.0, 1.0);
 
   //  Load shaders and initialize attribute buffers
-  programNormal = initShaders(gl, "vertex-shader", "fragment-shader");
-  gl.useProgram(programNormal);
-console.log('run')
+  var program = initShaders(gl, "vertex-shader", "fragment-shader");
+  gl.useProgram(program);
+
   // Load the data into the GPU
   var bufferId = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, bufferId);
   gl.bufferData(gl.ARRAY_BUFFER, flatten(vertices), gl.STATIC_DRAW);
 
   // Associate out shader variables with our data buffer
-  var vPosition = gl.getAttribLocation(programNormal, "vPosition");
+  var vPosition = gl.getAttribLocation(program, "vPosition");
   gl.vertexAttribPointer(vPosition, 2, gl.FLOAT, false, 0, 0);
   gl.enableVertexAttribArray(vPosition);
 
-  recalculate(gl, programNormal);
-  return gl;
+  render(gl);
 }
 
 const generateCanvasTessellated = () => {
@@ -183,8 +181,8 @@ const generateCanvasTessellated = () => {
   gl.clearColor(0.0, 0.0, 0.0, 1.0);
 
   //  Load shaders and initialize attribute buffers
-  var programTessellated = initShaders(gl, "vertex-shader", "fragment-shader");
-  gl.useProgram(programTessellated);
+  var program = initShaders(gl, "vertex-shader", "fragment-shader");
+  gl.useProgram(program);
 
   // Load the data into the GPU
   var bufferId = gl.createBuffer();
@@ -192,13 +190,11 @@ const generateCanvasTessellated = () => {
   gl.bufferData(gl.ARRAY_BUFFER, flatten(vertices), gl.STATIC_DRAW);
 
   // Associate out shader variables with our data buffer
-
-  var vPosition = gl.getAttribLocation(programTessellated, "vPosition");
+  var vPosition = gl.getAttribLocation(program, "vPosition");
   gl.vertexAttribPointer(vPosition, 2, gl.FLOAT, false, 0, 0);
   gl.enableVertexAttribArray(vPosition);
 
-  recalculate(gl, programTessellated);
-  return gl;
+  render(gl);
 }
 
 
@@ -276,7 +272,7 @@ recalculate();
 });
 
 */
-const recalculate = (gl, program) => {
+const recalculate = () => {
   points = [];
 
   for (var i = 0; i < vertices.length; i += 3) {
@@ -288,17 +284,17 @@ const recalculate = (gl, program) => {
   gl.vertexAttribPointer(vPosition, 2, gl.FLOAT, false, 0, 0);
   gl.enableVertexAttribArray(vPosition);
 
-  render(gl);
+  render();
 }
 
 const render = (gl) => {
-  console.log(points)
+  console.log('render2' + typeof (gl));
   gl.clear(gl.COLOR_BUFFER_BIT);/* 
 if (fill === 3 || fill === 4) {
   console.log('x')
   gl.drawArrays(gl.LINES, 0, points.length);
 } else { */
-  gl.drawArrays(gl.TRIANGLES, 0, 3);
+  gl.drawArrays(gl.TRIANGLES, 0, 3/* points.length */);
 }/* 
 }
  */
