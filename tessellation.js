@@ -138,7 +138,7 @@ const rotationSlider = (gl) => {
 const generateCanvasNormal = () => {
   var canvasNormal = document.getElementById("gl-canvas-normal");
   // Initialize the GL context
-  var gl = canvasNormal.getContext("webgl");
+  var gl = canvasNormal.getContext("webgl2");
 
   // Only continue if WebGL is available and working
   if (gl === null) {
@@ -171,7 +171,7 @@ const generateCanvasNormal = () => {
 const generateCanvasTessellated = () => {
   var canvasTessellated = document.getElementById("gl-canvas-tessellated");
   // Initialize the GL context
-  var gl = canvasTessellated.getContext("webgl");
+  var gl = canvasTessellated.getContext("webgl2");
 
   // Only continue if WebGL is available and working
   if (gl === null) {
