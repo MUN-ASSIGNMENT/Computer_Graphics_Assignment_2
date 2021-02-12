@@ -132,11 +132,11 @@ window.onload = init = () => {
 
 // Line or filled listner
 const RadioButton = (gl1, gl2, gl3) => {
-  const button = document.getElementById("fill-radio3"); //lines
-  const button1 = document.getElementById("fill-radio1"); //filled
+  const button = document.getElementById("lines"); //lines
+  const button1 = document.getElementById("filled"); //filled
 
   button.addEventListener("input", () => {
-    fill = 3;
+    fill = 2;
     console.log("lines button!", fill);
     recalculate(gl1, programNormal, 0);
     recalculate(gl2, programTessellated, tessellation);
@@ -349,7 +349,7 @@ const recalculate = (gl, program, tessellated = 0) => {
 
 const render2 = (gl) => {
   gl.clear(gl.COLOR_BUFFER_BIT);
-  if (fill === 3) { // filled in shape
+  if (fill === 2) { // filled in shape
     for (let i = 0; i < points.length; i += 3){
       gl.drawArrays(gl.LINE_LOOP, i, 3);
     }
