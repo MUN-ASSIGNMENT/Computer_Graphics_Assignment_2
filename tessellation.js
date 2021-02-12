@@ -6,9 +6,10 @@ var programNormal;
 var programTessellated;
 
 var progTest;
+var outLine = false;
 
 var fill = 1;
-var tessellation = 0;
+var tessellation = 1;
 var rotate = 0;
 var twist = false;
 
@@ -109,9 +110,6 @@ const RadioButton = () => {
 };
 
 
-
-
-
 const polygonSlider = (gl1, gl2, gl3) => {
   const slider = document.getElementById("polygon-slider");
   document.getElementById("polygon").innerHTML = "3";
@@ -137,8 +135,8 @@ const polygonSlider = (gl1, gl2, gl3) => {
         // vertices = vec_octa.slice(0);
         break;
     }
-    recalculate(gl1, programNormal);
-    recalculate(gl2, programTessellated);
+    recalculate(gl1, programNormal, 0);
+    recalculate(gl2, programTessellated, tessellation);
     verticeToPoints(gl3, progTest, sliderValue);
   })
 }
@@ -159,7 +157,7 @@ const rotationSlider = (gl) => {
   slider.addEventListener("input", () => {
     const sliderValue = slider.value;
     document.getElementById("rotation").innerHTML = sliderValue;
-    tessellation = sliderValue;
+    rotate = sliderValue;
   })
 }
 
@@ -221,7 +219,7 @@ const generateCanvasNormal = () => {
   gl.vertexAttribPointer(vPosition, 2, gl.FLOAT, false, 0, 0);
   gl.enableVertexAttribArray(vPosition);
 
-  recalculate(gl, programNormal);
+  recalculate(gl, programNormal, 0);
   return gl;
 }
 
@@ -255,7 +253,7 @@ const generateCanvasTessellated = () => {
   gl.vertexAttribPointer(vPosition, 2, gl.FLOAT, false, 0, 0);
   gl.enableVertexAttribArray(vPosition);
 
-  recalculate(gl, programTessellated);
+  recalculate(gl, programTessellated, tessellation);
   return gl;
 }
 
@@ -341,7 +339,7 @@ const verticeToPoints = (gl, program, d) => {
   var vPosition = gl.getAttribLocation(program, "vPosition");
   gl.vertexAttribPointer(vPosition, 2, gl.FLOAT, false, 0, 0);
   gl.enableVertexAttribArray(vPosition);
-  render(gl);
+  render2(gl);
 }
 
 
@@ -349,25 +347,40 @@ const verticeToPoints = (gl, program, d) => {
 const recalculate = (gl, program, tessellated = 0, fill = 1) => {
   points = [];
   for (var i = 0; i < vertices.length; i += 3) {
-    triangle(vertices[i + 0], vertices[i + 1], vertices[i + 2], tessellation = 0, fill = 1);
-  }console.log(fill)
+    triangle(vertices[i + 0], vertices[i + 1], vertices[i + 2], tessellated, fill = 1);
+  }
 
   gl.bufferData(gl.ARRAY_BUFFER, flatten(points), gl.STATIC_DRAW);
   var vPosition = gl.getAttribLocation(program, "vPosition");
   gl.vertexAttribPointer(vPosition, 2, gl.FLOAT, false, 0, 0);
   gl.enableVertexAttribArray(vPosition);
-  console.log(fill)
+
   render(gl);
+}
+
+const render2 = (gl) => {
+  gl.clear(gl.COLOR_BUFFER_BIT);
+  if (fill === 3) {
+    gl.drawArrays(gl.LINE_LOOP, 0, points.length);
+  } else {
+    gl.drawArrays(gl.TRIANGLE_FAN, 0, points.length);
+  }
 }
 
 const render = (gl) => {console.log(fill)
   gl.clear(gl.COLOR_BUFFER_BIT);
   console.log(fill)
   if (fill === 3) {
-    gl.drawArrays(gl.LINE_LOOP, 0, points.length);
+    for (let i = 0; i < points.length; i += 3){
+      gl.drawArrays(gl.LINE_LOOP, i, 3);
+    }
+    // gl.drawArrays(gl.LINE_LOOP, 0, points.length);
   } else {
-    gl.drawArrays(gl.TRIANGLE_FAN, 0, points.length);
-    console.log(points.length);
+    for (let i = 0; i < points.length; i += 3){
+      gl.drawArrays(gl.TRIANGLES, i, 3);
+    }
+    // gl.drawArrays(gl.TRIANGLE_FAN, 0, points.length);
+    // console.log(points.length);
   }
 }
 
