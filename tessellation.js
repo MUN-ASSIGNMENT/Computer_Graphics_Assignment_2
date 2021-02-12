@@ -9,7 +9,7 @@ var progTest;
 var outLine = false;
 
 var fill = 1;
-var tessellation = 1;
+var tessellation = 0;
 var rotate = 0;
 var twist = false;
 
@@ -89,23 +89,27 @@ window.onload = init = () => {
   let normalGl = generateCanvasNormal();
   let tessellatedGl = generateCanvasTessellated();
   let testGl = canvasTest();
-  RadioButton();
-  tessellationSlider();
+  RadioButton(normalGl, tessellatedGl, testGl);
+  tessellationSlider(normalGl, tessellatedGl);
   polygonSlider(normalGl, tessellatedGl, testGl);
   rotationSlider();
 }
 
 // Line or filled listner
-const RadioButton = () => {
+const RadioButton = (gl1, gl2) => {
   const button = document.getElementById("fill-radio3");
   const button1 = document.getElementById("fill-radio1");
 
   button.addEventListener("input", () => {
     fill = 3;
+    recalculate(gl1, programNormal, 0);
+    recalculate(gl2, programTessellated, tessellation);
   });
 
   button1.addEventListener("input", () => {
     fill = 1;
+    recalculate(gl1, programNormal, 0);
+    recalculate(gl2, programTessellated, tessellation);
   });
 };
 
@@ -141,13 +145,16 @@ const polygonSlider = (gl1, gl2, gl3) => {
   })
 }
 
-const tessellationSlider = (gl) => {
+const tessellationSlider = (gl1, gl2) => {
   const slider = document.getElementById("tessellation-slider");
   document.getElementById("tessellation").innerHTML = "0";
   slider.addEventListener("input", () => {
     const sliderValue = slider.value;
     document.getElementById("tessellation").innerHTML = sliderValue;
     tessellation = sliderValue;
+
+    recalculate(gl1, programNormal, 0);
+    recalculate(gl2, programTessellated, tessellation);
   })
 }
 
