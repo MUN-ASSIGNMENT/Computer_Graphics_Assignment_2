@@ -131,16 +131,16 @@ window.onload = init = () => {
 
 //listen to the event on the radio button: line or filled 
 const RadioButton = (gl1, gl2) => {
-  const button = document.getElementById("fill-radio3");
-  const button1 = document.getElementById("fill-radio1");
+  const lines = document.getElementById("lines");
+  const filled = document.getElementById("filled");
 
-  button.addEventListener("input", () => {
-    fill = 3;
+  lines.addEventListener("input", () => {
+    fill = 2;
     recalculate(gl1, programNormal, 0);
     recalculate(gl2, programTessellated, tessellation);
   });
 
-  button1.addEventListener("input", () => {
+  filled.addEventListener("input", () => {
     fill = 1;
     recalculate(gl1, programNormal, 0);
     recalculate(gl2, programTessellated, tessellation);
@@ -332,7 +332,7 @@ const recalculate = (gl, program, tessellated = 0, fill = 1) => {
 
 const render2 = (gl) => {
   gl.clear(gl.COLOR_BUFFER_BIT);
-  if (fill === 3) {
+  if (fill === 2) {
     gl.drawArrays(gl.LINE_LOOP, 0, points.length);
   } else {
     gl.drawArrays(gl.TRIANGLE_FAN, 0, points.length);
@@ -341,16 +341,17 @@ const render2 = (gl) => {
 
 const render = (gl) => {
   gl.clear(gl.COLOR_BUFFER_BIT);
-  if (fill === 3) {
+  if (fill === 2) {
+    console.log('what?')
     for (let i = 0; i < points.length; i += 3) {
       gl.drawArrays(gl.LINE_LOOP, i, 3);
     }
     // gl.drawArrays(gl.LINE_LOOP, 0, points.length);
   } else {
-    /* for (let i = 0; i < points.length; i += 3) {
+    for (let i = 0; i < points.length; i += 3) {
       gl.drawArrays(gl.TRIANGLES, i, 3);
-    } */
-    gl.drawArrays(gl.TRIANGLE_FAN, 0, points.length);
+    }
+    //gl.drawArrays(gl.TRIANGLE_FAN, 0, points.length);
     // console.log(points.length);
   }
 }
@@ -371,7 +372,7 @@ const triangle = (a, b, c, count, fill) => {
       (c[0] * Math.cos(dc)) - (c[1] * Math.sin(dc)),
       (c[0] * Math.sin(dc)) + (c[1] * Math.cos(dc)));
 
-    if (fill == 3) {
+    if (fill == 2) {
       points.push(ap, bp, ap, cp, bp, cp);
     } else {
       points.push(ap, bp, cp);
@@ -387,9 +388,10 @@ const triangle = (a, b, c, count, fill) => {
   triangle(a, ab, ac, (count - 1), fill);
   triangle(b, bc, ab, (count - 1), fill);
   triangle(c, ac, bc, (count - 1), fill);
-  if (fill == 1 || fill == 3) {
+  if (fill == 1 || fill == 2) {
     triangle(ab, ac, bc, (count - 1), fill);
   }
+  
 }
 
 // helper func
