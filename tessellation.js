@@ -5,6 +5,8 @@ var points;
 var programNormal;
 var programTessellated;
 
+var progTest;
+
 var fill = 1;
 var tessellation = 0;
 var rotate = 0;
@@ -78,17 +80,39 @@ var vec_hexagon = [
 
 ];
 
+var vec_octa = makeShape(8);
+
 vertices = vec_triangle.slice(0);
 
 window.onload = init = () => {
   let normalGl = generateCanvasNormal();
   let tessellatedGl = generateCanvasTessellated();
+  let testGl = canvasTest();
+  RadioButton();
   tessellationSlider();
-  polygonSlider(normalGl, tessellatedGl);
+  polygonSlider(normalGl, tessellatedGl, testGl);
   rotationSlider();
 }
 
-const polygonSlider = (gl1, gl2) => {
+// Line or filled listner
+const RadioButton = () => {
+  const button = document.getElementById("fill-radio3");
+  const button1 = document.getElementById("fill-radio1");
+
+  button.addEventListener("input", () => {
+    fill = 3;
+  });
+
+  button1.addEventListener("input", () => {
+    fill = 1;
+  });
+};
+
+
+
+
+
+const polygonSlider = (gl1, gl2, gl3) => {
   const slider = document.getElementById("polygon-slider");
   document.getElementById("polygon").innerHTML = "3";
   slider.addEventListener("input", () => {
@@ -109,9 +133,13 @@ const polygonSlider = (gl1, gl2) => {
       case "6":
         vertices = vec_hexagon.slice(0);
         break;
+      case "8":
+        // vertices = vec_octa.slice(0);
+        break;
     }
-    recalculate(gl1, programNormal)
-    recalculate(gl2, programTessellated)
+    recalculate(gl1, programNormal);
+    recalculate(gl2, programTessellated);
+    verticeToPoints(gl3, progTest, sliderValue);
   })
 }
 
@@ -133,6 +161,35 @@ const rotationSlider = (gl) => {
     document.getElementById("rotation").innerHTML = sliderValue;
     tessellation = sliderValue;
   })
+}
+
+const canvasTest = () => {
+  var canvasTest = document.getElementById("gl-canvas-test");
+  // Initialize the GL context
+  var gl = canvasTest.getContext("webgl2");
+
+  // Only continue if WebGL is available and working
+  if (gl === null) {
+    alert("Unable to initialize WebGL. Your browser or machine may not support it.");
+    return;
+  }
+
+  //  Configure WebGL
+  gl.viewport(0, 0, canvasTest.width, canvasTest.height);
+  gl.clearColor(0.0, 0.0, 0.0, 1.0);
+
+  //  Load shaders and initialize attribute buffers
+  progTest = initShaders(gl, "vertex-shader", "fragment-shader");
+  gl.useProgram(progTest);
+
+  // Load the data into the GPU
+  var bufferId = gl.createBuffer();
+  // Bind the id buffer here.
+  gl.bindBuffer(gl.ARRAY_BUFFER, bufferId);
+
+  // default situation - triangle when the page is loaded.
+  verticeToPoints(gl, progTest, 3);
+  return gl;
 }
 
 const generateCanvasNormal = () => {
@@ -277,9 +334,20 @@ recalculate();
 });
 
 */
+const verticeToPoints = (gl, program, d) => {
+  points = makeShape(d);
+  
+  gl.bufferData(gl.ARRAY_BUFFER, flatten(points), gl.STATIC_DRAW);
+  var vPosition = gl.getAttribLocation(program, "vPosition");
+  gl.vertexAttribPointer(vPosition, 2, gl.FLOAT, false, 0, 0);
+  gl.enableVertexAttribArray(vPosition);
+  render(gl);
+}
+
+
+
 const recalculate = (gl, program, tessellated = 0, fill = 1) => {
   points = [];
-  
   for (var i = 0; i < vertices.length; i += 3) {
     triangle(vertices[i + 0], vertices[i + 1], vertices[i + 2], tessellation = 0, fill = 1);
   }console.log(fill)
@@ -296,9 +364,10 @@ const render = (gl) => {console.log(fill)
   gl.clear(gl.COLOR_BUFFER_BIT);
   console.log(fill)
   if (fill === 3) {
-    gl.drawArrays(gl.LINES, 0, 3);
+    gl.drawArrays(gl.LINE_LOOP, 0, points.length);
   } else {
-    gl.drawArrays(gl.TRIANGLES, 0, points.length);
+    gl.drawArrays(gl.TRIANGLE_FAN, 0, points.length);
+    console.log(points.length);
   }
 }
 
@@ -345,3 +414,16 @@ const triangle = (a, b, c, count, fill) => {
   }
 }
 
+// helper func
+function makeShape(d) {
+  let p1 = [];
+  let rad = Math.PI * 2.0;
+
+  for(let i=0; i<d; i++){
+      let x = 1 * Math.cos(rad/d * i);
+      let y = 1 * Math.sin(rad/d * i);
+      p1.push(vec2(x, y));
+  }
+
+  return p1;
+}
