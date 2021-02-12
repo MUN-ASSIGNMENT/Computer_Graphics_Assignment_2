@@ -11,7 +11,6 @@ var outLine = false;
 var fill = 1;
 var tessellation = 0;
 var rotate = 0;
-var twist = true;
 
 /* triangle */
 var vec_triangle = [
@@ -81,10 +80,45 @@ var vec_hexagon = [
 
 ];
 
+var vec_octagon = [
+  vec2(1, 0),
+  vec2(0.7071067811865476, 0.7071067811865475),
+  vec2(6.123233995736766e-17, 1),
+
+  vec2(-0.7071067811865475, 0.7071067811865476),
+  vec2(-1, 1.2246467991473532e-16),
+  vec2(-0.7071067811865477, -0.7071067811865475),
+
+  vec2(-1.8369701987210297e-16, -1),
+  vec2(0.7071067811865474, -0.7071067811865477),
+  vec2(1, -2.4492935982947064e-16),
+
+  vec2(0.7071067811865477, 0.7071067811865474),
+  vec2(3.061616997868383e-16, 1),
+  vec2(-0.7071067811865467, 0.7071067811865483),
+
+  vec2(-1, 3.6739403974420594e-16),
+  vec2(-0.7071067811865471, -0.7071067811865479),
+  vec2(-4.286263797015736e-16, -1),
+
+  vec2(0.7071067811865466, -0.7071067811865485),
+  vec2(1, -4.898587196589413e-16),
+  vec2(0.7071067811865472, 0.7071067811865478),
+
+  vec2(5.51091059616309e-16, 1),
+  vec2(-0.7071067811865465, 0.7071067811865486),
+  vec2(-1, 6.123233995736766e-16),
+
+  vec2(-0.7071067811865474, -0.7071067811865477),
+  vec2(-2.4499125789312946e-15, -1),
+  vec2(0.7071067811865465, -0.70710678118654),
+]
+
 var vec_octa = makeShape(8);
 
 vertices = vec_triangle.slice(0);
 
+//render following function onload
 window.onload = init = () => {
   let normalGl = generateCanvasNormal();
   let tessellatedGl = generateCanvasTessellated();
@@ -95,7 +129,7 @@ window.onload = init = () => {
   rotationSlider(normalGl, tessellatedGl);
 }
 
-// Line or filled listner
+//listen to the event on the radio button: line or filled 
 const RadioButton = (gl1, gl2) => {
   const button = document.getElementById("fill-radio3");
   const button1 = document.getElementById("fill-radio1");
@@ -113,7 +147,7 @@ const RadioButton = (gl1, gl2) => {
   });
 };
 
-
+//listen to to the slider on UI for number of sides for the polygon
 const polygonSlider = (gl1, gl2, gl3) => {
   const slider = document.getElementById("polygon-slider");
   document.getElementById("polygon").innerHTML = "3";
@@ -136,15 +170,17 @@ const polygonSlider = (gl1, gl2, gl3) => {
         vertices = vec_hexagon.slice(0);
         break;
       case "8":
-        // vertices = vec_octa.slice(0);
+        vertices = vec_octagon.slice(0);
         break;
     }
+
     recalculate(gl1, programNormal, 0);
     recalculate(gl2, programTessellated, tessellation);
     verticeToPoints(gl3, progTest, sliderValue);
   })
 }
 
+//listen to to the slider on UI for the number of subdivision 
 const tessellationSlider = (gl1, gl2) => {
   const slider = document.getElementById("tessellation-slider");
   document.getElementById("tessellation").innerHTML = "0";
@@ -158,6 +194,7 @@ const tessellationSlider = (gl1, gl2) => {
   })
 }
 
+//listen to to the slider on UI for the number of degree to rotate 
 const rotationSlider = (gl1, gl2) => {
   const slider = document.getElementById("rotation-slider");
   document.getElementById("rotation").innerHTML = "0";
@@ -199,6 +236,7 @@ const canvasTest = () => {
   return gl;
 }
 
+//generate a normal canvas
 const generateCanvasNormal = () => {
   var canvasNormal = document.getElementById("gl-canvas-normal");
   // Initialize the GL context
@@ -232,6 +270,7 @@ const generateCanvasNormal = () => {
   return gl;
 }
 
+//generate a tessellated canvas
 const generateCanvasTessellated = () => {
   var canvasTessellated = document.getElementById("gl-canvas-tessellated");
   // Initialize the GL context
@@ -268,14 +307,13 @@ const generateCanvasTessellated = () => {
 
 const verticeToPoints = (gl, program, d) => {
   points = makeShape(d);
-  
+
   gl.bufferData(gl.ARRAY_BUFFER, flatten(points), gl.STATIC_DRAW);
   var vPosition = gl.getAttribLocation(program, "vPosition");
   gl.vertexAttribPointer(vPosition, 2, gl.FLOAT, false, 0, 0);
   gl.enableVertexAttribArray(vPosition);
   render2(gl);
 }
-
 
 
 const recalculate = (gl, program, tessellated = 0, fill = 1) => {
@@ -301,28 +339,28 @@ const render2 = (gl) => {
   }
 }
 
-const render = (gl) => {console.log(fill)
+const render = (gl) => {
   gl.clear(gl.COLOR_BUFFER_BIT);
   console.log(fill)
   if (fill === 3) {
-    for (let i = 0; i < points.length; i += 3){
+    for (let i = 0; i < points.length; i += 3) {
       gl.drawArrays(gl.LINE_LOOP, i, 3);
     }
     // gl.drawArrays(gl.LINE_LOOP, 0, points.length);
   } else {
-    for (let i = 0; i < points.length; i += 3){
+    /* for (let i = 0; i < points.length; i += 3) {
       gl.drawArrays(gl.TRIANGLES, i, 3);
-    }
-    // gl.drawArrays(gl.TRIANGLE_FAN, 0, points.length);
+    } */
+    gl.drawArrays(gl.TRIANGLE_FAN, 0, points.length);
     // console.log(points.length);
   }
 }
 
 const triangle = (a, b, c, count, fill) => {
   if (count === 0) {
-      var da = Math.sqrt(Math.pow(a[0], 2) + Math.pow(a[1], 2)) * (rotate * Math.PI / 180.0);
-      var db = Math.sqrt(Math.pow(b[0], 2) + Math.pow(b[1], 2)) * (rotate * Math.PI / 180.0);
-      var dc = Math.sqrt(Math.pow(c[0], 2) + Math.pow(c[1], 2)) * (rotate * Math.PI / 180.0);
+    var da = Math.sqrt(Math.pow(a[0], 2) + Math.pow(a[1], 2)) * (rotate * Math.PI / 180.0);
+    var db = Math.sqrt(Math.pow(b[0], 2) + Math.pow(b[1], 2)) * (rotate * Math.PI / 180.0);
+    var dc = Math.sqrt(Math.pow(c[0], 2) + Math.pow(c[1], 2)) * (rotate * Math.PI / 180.0);
 
     var ap = vec2(
       (a[0] * Math.cos(da)) - (a[1] * Math.sin(da)),
@@ -360,10 +398,10 @@ function makeShape(d) {
   let p1 = [];
   let rad = Math.PI * 2.0;
 
-  for(let i=0; i<d; i++){
-      let x = 1 * Math.cos(rad/d * i);
-      let y = 1 * Math.sin(rad/d * i);
-      p1.push(vec2(x, y));
+  for (let i = 0; i < d; i++) {
+    let x = 1 * Math.cos(rad / d * i);
+    let y = 1 * Math.sin(rad / d * i);
+    p1.push(vec2(x, y));
   }
 
   return p1;
