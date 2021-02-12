@@ -320,15 +320,9 @@ const render = (gl) => {console.log(fill)
 
 const triangle = (a, b, c, count, fill) => {
   if (count === 0) {
-    if (twist) {
       var da = Math.sqrt(Math.pow(a[0], 2) + Math.pow(a[1], 2)) * (rotate * Math.PI / 180.0);
       var db = Math.sqrt(Math.pow(b[0], 2) + Math.pow(b[1], 2)) * (rotate * Math.PI / 180.0);
       var dc = Math.sqrt(Math.pow(c[0], 2) + Math.pow(c[1], 2)) * (rotate * Math.PI / 180.0);
-    } else {
-      var da = (rotate * Math.PI / 180.0);
-      var db = (rotate * Math.PI / 180.0);
-      var dc = (rotate * Math.PI / 180.0);
-    }
 
     var ap = vec2(
       (a[0] * Math.cos(da)) - (a[1] * Math.sin(da)),
@@ -340,7 +334,7 @@ const triangle = (a, b, c, count, fill) => {
       (c[0] * Math.cos(dc)) - (c[1] * Math.sin(dc)),
       (c[0] * Math.sin(dc)) + (c[1] * Math.cos(dc)));
 
-    if (fill == 3 || fill == 4) {
+    if (fill == 3) {
       points.push(ap, bp, ap, cp, bp, cp);
     } else {
       points.push(ap, bp, cp);
