@@ -13,14 +13,14 @@ var tessellation = 0;
 var rotate = 0;
 
 /* triangle */
-var vec_triangle = [
+var vecTriangle = [
   vec2(-0.85, -0.4907477295),
   vec2(0.85, -0.4907477295),
   vec2(0.0, 0.9814954573)
 ];
 
 /* square */
-var vec_square = [
+var vecSquare = [
   vec2(-0.7, -0.7),
   vec2(0.7, 0.7),
   vec2(-0.7, 0.7),
@@ -30,7 +30,7 @@ var vec_square = [
   vec2(0.7, -0.7)
 ];
 
-var vec_pentagon = [
+var vecPentagon = [
   vec2(0.0, 0.0),
   vec2(0.0, -1.000000),
   vec2(-0.951057, -0.309017),
@@ -53,7 +53,7 @@ var vec_pentagon = [
 ];
 
 
-var vec_hexagon = [
+var vecHexagon = [
   vec2(0.0, 0.0),
   vec2(0.0, -1.000000),
   vec2(-0.866025, -0.500000),
@@ -80,7 +80,7 @@ var vec_hexagon = [
 
 ];
 
-var vec_octagon = [
+var vecOctagon = [
   vec2(0, 0),
   vec2(0.7071067811865476, 0.7071067811865475),
   vec2(6.123233995736766e-17, 1),
@@ -116,7 +116,7 @@ var vec_octagon = [
 
 var vec_octa = makeShape(8);
 
-vertices = vec_triangle.slice(0);
+vertices = vecTriangle.slice(0);
 
 //render following function onload
 window.onload = init = () => {
@@ -158,19 +158,19 @@ const polygonSlider = (gl1, gl2, gl3) => {
     switch (sliderValue) {
       default:
       case "3":
-        vertices = vec_triangle.slice(0);
+        vertices = vecTriangle.slice(0);
         break;
       case "4":
-        vertices = vec_square.slice(0);
+        vertices = vecSquare.slice(0);
         break;
       case "5":
-        vertices = vec_pentagon.slice(0);
+        vertices = vecPentagon.slice(0);
         break;
       case "6":
-        vertices = vec_hexagon.slice(0);
+        vertices = vecHexagon.slice(0);
         break;
       case "8":
-        vertices = vec_octagon.slice(0);
+        vertices = vecOctagon.slice(0);
         break;
     }
 
