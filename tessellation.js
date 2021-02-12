@@ -92,7 +92,7 @@ window.onload = init = () => {
   RadioButton(normalGl, tessellatedGl, testGl);
   tessellationSlider(normalGl, tessellatedGl);
   polygonSlider(normalGl, tessellatedGl, testGl);
-  rotationSlider();
+  rotationSlider(normalGl, tessellatedGl);
 }
 
 // Line or filled listner
@@ -158,13 +158,15 @@ const tessellationSlider = (gl1, gl2) => {
   })
 }
 
-const rotationSlider = (gl) => {
+const rotationSlider = (gl1, gl2) => {
   const slider = document.getElementById("rotation-slider");
   document.getElementById("rotation").innerHTML = "0";
   slider.addEventListener("input", () => {
     const sliderValue = slider.value;
     document.getElementById("rotation").innerHTML = sliderValue;
     rotate = sliderValue;
+    recalculate(gl1, programNormal, 0);
+    recalculate(gl2, programTessellated, tessellation);
   })
 }
 
@@ -264,81 +266,6 @@ const generateCanvasTessellated = () => {
   return gl;
 }
 
-
-/* 
-$("#shape").selectmenu({change: function( event, ui ) {
-  
-  switch (ui.item.value) {
-    default:
-    case "3":
-      vertices = vec_triangle.slice(0);
-      break;
-    case "4":
-      vertices = vec_square.slice(0);
-      break;
-    case "5":
-      vertices = vec_pentagon.slice(0);
-      break;
-    case "6":
-      vertices = vec_hexagon.slice(0);
-      break;
-  } 
-  recalculate();
-  
-}});
- 
-$("#tessellation-slider").slider({
-  value:  0,
-  min:    0,
-  max:    5,
-  step:   1,
-  slide:  function(event, ui) {
-    $("#tessellation").val("" + ui.value + "");
-    tessellation = ui.value;
-    recalculate();
-}});
-
-$("#fill").buttonset();
-$("#fill-radio1" , "#fill").click(function() {
-  fill = 1;
-  recalculate();
-});
-$("#fill-radio2" , "#fill").click(function() {
-  fill = 2;
-  recalculate();
-});
-$("#fill-radio3" , "#fill").click(function() {
-  fill = 3;
-  recalculate();
-});
-$("#fill-radio4" , "#fill").click(function() {
-  fill = 4;
-  recalculate();
-}); 
-
-$("#rotation-slider").slider({
-value:  0,
-min:    0,
-max:    1800,
-step:   1,
-slide:  function(event, ui) {
-  $("#rotation").val("" + ui.value + "°");
-  rotate = ui.value;
-  recalculate();
-}});
-});
-
-$("#twist").buttonset();
-$("#twist-radio1" , "#twist").click(function() {
-twist = false;
-recalculate();
-});
-$("#twist-radio2", "#twist").click(function() {
-twist = true;
-recalculate();
-});
-
-*/
 const verticeToPoints = (gl, program, d) => {
   points = makeShape(d);
   
