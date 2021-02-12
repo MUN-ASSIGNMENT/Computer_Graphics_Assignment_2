@@ -11,7 +11,7 @@ var outLine = false;
 var fill = 1;
 var tessellation = 0;
 var rotate = 0;
-var twist = false;
+var twist = true;
 
 /* triangle */
 var vec_triangle = [
