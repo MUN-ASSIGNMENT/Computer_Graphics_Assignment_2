@@ -354,6 +354,7 @@ const render2 = (gl) => {
       gl.drawArrays(gl.LINE_LOOP, i, 3);
     }
   } else { // skeleton shape
+    // coloring test
     for (let i = 0; i < points.length; i += 3){
       gl.drawArrays(gl.TRIANGLES, i, 3);
     }
