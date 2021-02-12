@@ -7,6 +7,7 @@ var programTessellated;
 
 var progTest;
 var outLine = false;
+var howMnayPoints = 3;
 
 var fill = 1;
 var tessellation = 0;
@@ -124,26 +125,29 @@ window.onload = init = () => {
   let tessellatedGl = generateCanvasTessellated();
   let testGl = canvasTest();
   RadioButton(normalGl, tessellatedGl, testGl);
-  tessellationSlider(normalGl, tessellatedGl);
+  tessellationSlider(normalGl, tessellatedGl, testGl);
   polygonSlider(normalGl, tessellatedGl, testGl);
-  rotationSlider(normalGl, tessellatedGl);
+  rotationSlider(normalGl, tessellatedGl, testGl);
 }
 
-//listen to the event on the radio button: line or filled 
-const RadioButton = (gl1, gl2) => {
-  const lines = document.getElementById("lines");
-  const filled = document.getElementById("filled");
+// Line or filled listner
+const RadioButton = (gl1, gl2, gl3) => {
+  const button = document.getElementById("fill-radio3"); //lines
+  const button1 = document.getElementById("fill-radio1"); //filled
 
-  lines.addEventListener("input", () => {
-    fill = 2;
+  button.addEventListener("input", () => {
+    fill = 3;
+    console.log("lines button!", fill);
     recalculate(gl1, programNormal, 0);
     recalculate(gl2, programTessellated, tessellation);
+    verticeToPoints(gl3, progTest, howMnayPoints);
   });
 
   filled.addEventListener("input", () => {
     fill = 1;
     recalculate(gl1, programNormal, 0);
     recalculate(gl2, programTessellated, tessellation);
+    verticeToPoints(gl3, progTest, howMnayPoints);
   });
 };
 
@@ -154,6 +158,10 @@ const polygonSlider = (gl1, gl2, gl3) => {
   slider.addEventListener("input", () => {
     const sliderValue = slider.value === "7" ? "8" : slider.value;
     document.getElementById("polygon").innerHTML = sliderValue;
+
+    howMnayPoints = sliderValue;
+
+    console.log("FILL: ", fill);
 
     switch (sliderValue) {
       default:
@@ -176,12 +184,12 @@ const polygonSlider = (gl1, gl2, gl3) => {
 
     recalculate(gl1, programNormal, 0);
     recalculate(gl2, programTessellated, tessellation);
-    verticeToPoints(gl3, progTest, sliderValue);
+    verticeToPoints(gl3, progTest, howMnayPoints);
   })
 }
 
 //listen to to the slider on UI for the number of subdivision 
-const tessellationSlider = (gl1, gl2) => {
+const tessellationSlider = (gl1, gl2, gl3) => {
   const slider = document.getElementById("tessellation-slider");
   document.getElementById("tessellation").innerHTML = "0";
   slider.addEventListener("input", () => {
@@ -191,11 +199,12 @@ const tessellationSlider = (gl1, gl2) => {
 
     recalculate(gl1, programNormal, 0);
     recalculate(gl2, programTessellated, tessellation);
+    verticeToPoints(gl3, progTest, howMnayPoints);
   })
 }
 
 //listen to to the slider on UI for the number of degree to rotate 
-const rotationSlider = (gl1, gl2) => {
+const rotationSlider = (gl1, gl2, gl3) => {
   const slider = document.getElementById("rotation-slider");
   document.getElementById("rotation").innerHTML = "0";
   slider.addEventListener("input", () => {
@@ -204,6 +213,7 @@ const rotationSlider = (gl1, gl2) => {
     rotate = sliderValue;
     recalculate(gl1, programNormal, 0);
     recalculate(gl2, programTessellated, tessellation);
+    verticeToPoints(gl3, progTest, howMnayPoints);
   })
 }
 
@@ -232,7 +242,7 @@ const canvasTest = () => {
   gl.bindBuffer(gl.ARRAY_BUFFER, bufferId);
 
   // default situation - triangle when the page is loaded.
-  verticeToPoints(gl, progTest, 3);
+  verticeToPoints(gl, progTest, howMnayPoints);
   return gl;
 }
 
@@ -306,8 +316,14 @@ const generateCanvasTessellated = () => {
 }
 
 const verticeToPoints = (gl, program, d) => {
-  points = makeShape(d);
+  points = [];// makeShape(d);
 
+  let tmpV = makeShape(d);
+
+  for (var i = 0; i < tmpV.length; i += 3) {
+    triangle(tmpV[i + 0], tmpV[i + 1], tmpV[i + 2], tessellation, 1);
+  }
+  
   gl.bufferData(gl.ARRAY_BUFFER, flatten(points), gl.STATIC_DRAW);
   var vPosition = gl.getAttribLocation(program, "vPosition");
   gl.vertexAttribPointer(vPosition, 2, gl.FLOAT, false, 0, 0);
@@ -316,10 +332,11 @@ const verticeToPoints = (gl, program, d) => {
 }
 
 
-const recalculate = (gl, program, tessellated = 0, fill = 1) => {
+
+const recalculate = (gl, program, tessellated = 0) => {
   points = [];
   for (var i = 0; i < vertices.length; i += 3) {
-    triangle(vertices[i + 0], vertices[i + 1], vertices[i + 2], tessellated, fill = 1);
+    triangle(vertices[i + 0], vertices[i + 1], vertices[i + 2], tessellated, 1);
   }
 
   gl.bufferData(gl.ARRAY_BUFFER, flatten(points), gl.STATIC_DRAW);
@@ -332,10 +349,14 @@ const recalculate = (gl, program, tessellated = 0, fill = 1) => {
 
 const render2 = (gl) => {
   gl.clear(gl.COLOR_BUFFER_BIT);
-  if (fill === 2) {
-    gl.drawArrays(gl.LINE_LOOP, 0, points.length);
-  } else {
-    gl.drawArrays(gl.TRIANGLE_FAN, 0, points.length);
+  if (fill === 3) { // filled in shape
+    for (let i = 0; i < points.length; i += 3){
+      gl.drawArrays(gl.LINE_LOOP, i, 3);
+    }
+  } else { // skeleton shape
+    for (let i = 0; i < points.length; i += 3){
+      gl.drawArrays(gl.TRIANGLES, i, 3);
+    }
   }
 }
 
@@ -346,21 +367,18 @@ const render = (gl) => {
     for (let i = 0; i < points.length; i += 3) {
       gl.drawArrays(gl.LINE_LOOP, i, 3);
     }
-    // gl.drawArrays(gl.LINE_LOOP, 0, points.length);
   } else {
     for (let i = 0; i < points.length; i += 3) {
       gl.drawArrays(gl.TRIANGLES, i, 3);
     }
-    //gl.drawArrays(gl.TRIANGLE_FAN, 0, points.length);
-    // console.log(points.length);
   }
 }
 
 const triangle = (a, b, c, count, fill) => {
-  if (count === 0) {
-    var da = Math.sqrt(Math.pow(a[0], 2) + Math.pow(a[1], 2)) * (rotate * Math.PI / 180.0);
-    var db = Math.sqrt(Math.pow(b[0], 2) + Math.pow(b[1], 2)) * (rotate * Math.PI / 180.0);
-    var dc = Math.sqrt(Math.pow(c[0], 2) + Math.pow(c[1], 2)) * (rotate * Math.PI / 180.0);
+  if (count == 0) {
+      var da = Math.sqrt(Math.pow(a[0], 2) + Math.pow(a[1], 2)) * (rotate * Math.PI / 180.0);
+      var db = Math.sqrt(Math.pow(b[0], 2) + Math.pow(b[1], 2)) * (rotate * Math.PI / 180.0);
+      var dc = Math.sqrt(Math.pow(c[0], 2) + Math.pow(c[1], 2)) * (rotate * Math.PI / 180.0);
 
     var ap = vec2(
       (a[0] * Math.cos(da)) - (a[1] * Math.sin(da)),
@@ -395,14 +413,21 @@ const triangle = (a, b, c, count, fill) => {
 }
 
 // helper func
+// creating shapes according to the given d(num of edges)
 function makeShape(d) {
   let p1 = [];
   let rad = Math.PI * 2.0;
 
-  for (let i = 0; i < d; i++) {
-    let x = 1 * Math.cos(rad / d * i);
-    let y = 1 * Math.sin(rad / d * i);
-    p1.push(vec2(x, y));
+  for(let i=0; i<d; i++){
+      let x = 1 * Math.cos(rad/d * i);
+      let y = 1 * Math.sin(rad/d * i);
+      let nextI = i === d-1 ? 0 : i+1;
+      let nextX = 1 * Math.cos(rad/d * nextI);
+      let nextY = 1 * Math.sin(rad/d * nextI);
+      p1.push(vec2(0, 0));
+      p1.push(vec2(x, y));
+      p1.push(vec2(nextX, nextY));
+
   }
 
   return p1;
