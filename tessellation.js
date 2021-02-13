@@ -5,6 +5,7 @@ var programNormal;
 var programTessellated;
 var colorLocation;
 
+var progShape;
 var outLine = false;
 var howMnayPoints = 3;
 
@@ -157,6 +158,7 @@ vertices = vecTriangle.slice(0);
 window.onload = init = () => {
   let normalGl = generateCanvasNormal();
   let tessellatedGl = generateCanvasTessellated();
+  let shapeGL = canvasShape();
   RadioButton(normalGl, tessellatedGl);
   tessellationSlider(normalGl, tessellatedGl);
   polygonSlider(normalGl, tessellatedGl);
@@ -184,7 +186,7 @@ const RadioButton = (gl1, gl2, gl3) => {
     recalculate(gl2, programTessellated, tessellation);
   });
 
-  button1.addEventListener("input", () => {
+  filled.addEventListener("input", () => {
     fill = 1;
     recalculate(gl1, programNormal, 0);
     recalculate(gl2, programTessellated, tessellation);
@@ -252,6 +254,31 @@ const rotationSlider = (gl1, gl2, gl3) => {
     recalculate(gl1, programNormal, 0);
     recalculate(gl2, programTessellated, tessellation);
   })
+}
+
+const canvasShape = () => {
+  var canvas_shape = document.getElementById("gl-canvas-shape");
+  // Initialize the GL context
+  var gl = canvas_shape.getContext("webgl2");
+
+  // Only continue if WebGL is available and working
+  if (gl === null) {
+    alert("Unable to initialize WebGL. Your browser or machine may not support it.");
+    return;
+  }
+
+  //  Configure WebGL
+  gl.viewport(0, 0, canvas_shape.width, canvas_shape.height);
+  gl.clearColor(0.0, 0.0, 0.0, 1.0);
+
+  //  Load shaders and initialize attribute buffers
+  progShape = initShaders(gl, "vertex-shader", "fragment-shader");
+  gl.useProgram(progShape);
+
+  verticeToPoints(gl, progShape)
+  renderStar(gl);
+
+  return gl;
 }
 
 //generate a normal canvas
@@ -376,6 +403,13 @@ const render = (gl) => {
       gl.drawArrays(gl.TRIANGLES, i, 3);
     }
   }
+}
+
+const renderStar = (gl) => {
+  gl.clear(gl.COLOR_BUFFER_BIT);
+  var vPosition = gl.getAttribLocation(progShape, "vPosition");
+  gl.vertexAttribPointer(vPosition, 2, gl.FLOAT, false, 0, 0);
+  gl.drawArrays(gl.TRIANGLE_FAN, 0, 12);
 }
 
 // tessellation method
