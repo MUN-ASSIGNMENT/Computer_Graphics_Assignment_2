@@ -26,50 +26,57 @@
 </head>
 
 <body>
-  <div>
-    <label># of Polygon sides: <span id="polygon" readonly
-        style="border:0; color:#f6931f; font-weight:bold;"></span></label>
-    <br />
-    <input id="polygon-slider" type="range" value="0" min=3 max=7 step="1">
+  <div style="display: flex; justify-content: center; margin: 5em;">
+    <div style="padding-right: 2em;">
+      <label># of Polygon sides: <span id="polygon" readonly
+          style="border:0; color:#f6931f; font-weight:bold;"></span></label>
+      <br />
+      <input id="polygon-slider" type="range" value="0" min=3 max=7 step="1">
+    </div>
+
+    <div style="padding-right: 2em;">
+      <label>Tessellation: <span id="tessellation" readonly
+          style="border:0; color:#f6931f; font-weight:bold;"></span></label>
+      <br />
+      <input id="tessellation-slider" type="range" value="0" min=0 max=5 step="1">
+    </div>
+
+    <div id="fill" style="padding-right: 2em;">
+      <input type="radio" id="filled" name="fill-radio" checked="checked"><label>Filled
+        Colored</label>
+      <input type="radio" id="lines" name="fill-radio"><label>Lines</label>
+    </div>
+
+    <div style="padding-right: 2em;">
+      <label>Rotation:<span id="rotation" readonly style="border:0; color:#f6931f; font-weight:bold;"></span></label>
+      <br />
+      <input id="rotation-slider" type="range" value="0" min=0 max=360 step="1">
+    </div>
   </div>
 
-  <div>
-    <label>Tessellation: <span id="tessellation" readonly
-        style="border:0; color:#f6931f; font-weight:bold;"></span></label>
-    <br />
-    <input id="tessellation-slider" type="range" value="0" min=0 max=5 step="1">
+  <div style="display: flex; align-items: baseline; justify-content: space-around;">
+    <div>
+      <canvas id="gl-canvas-normal" width="256" height="256" style="border: 2px solid black">
+        Oops ... your browser doesn't support the HTML5 canvas element
+      </canvas>
+      <br />
+      <label>Simple Shapes</label>
+    </div>
+    <div>
+      <canvas id="gl-canvas-tessellated" width="256" height="256" style="border: 2px solid black">
+        Oops ... your browser doesn't support the HTML5 canvas element
+      </canvas>
+      <br />
+      <label>Tessellated Shapes</label>
+    </div>
+    <div>
+      <canvas id="gl-canvas-test" width="256" height="256" style="border: 2px solid black">
+        Oops ... your browser doesn't support the HTML5 canvas element
+      </canvas>
+      <p>Bonus</p>
+    </div>
   </div>
 
-  <div id="fill">
-    <input type="radio" id="filled" name="fill-radio" checked="checked"><label>Filled
-      Colored</label>
-    <input type="radio" id="lines" name="fill-radio"><label>Lines</label>
-
-  </div>
-
-  <div>
-    <label>Rotation:<span id="rotation" readonly style="border:0; color:#f6931f; font-weight:bold;"></span></label>
-    <br />
-    <input id="rotation-slider" type="range" value="0" min=0 max=360 step="1">
-  </div>
-
-  <div>
-    <canvas id="gl-canvas-normal" width="256" height="256" style="border: 2px solid black">
-      Oops ... your browser doesn't support the HTML5 canvas element
-    </canvas>
-    <canvas id="gl-canvas-test" width="256" height="256" style="border: 2px solid black">
-      Oops ... your browser doesn't support the HTML5 canvas element
-    </canvas>
-    <br/>
-    <label>Simple Shapes</label>
-  </div>
-  <div>
-    <canvas id="gl-canvas-tessellated" width="256" height="256" style="border: 2px solid black">
-      Oops ... your browser doesn't support the HTML5 canvas element
-    </canvas>
-    <br/>
-    <label>Tessellated Shapes</label>
-  </div>
 </body>
 
 </html>
