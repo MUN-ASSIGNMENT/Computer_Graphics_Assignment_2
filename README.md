@@ -2,7 +2,7 @@
     Group 15: Seokho Han(seokhoh@mun.ca), Yee Teing Lo(ytlo@mun.ca)
 ## How to run
     1. open <index.html> - use Chrome 
-    2. adjust [# of polygon sides, Tessellation, (Filled or Lines), Rotation]
+    2. adjust [# of polygon sides, Tessellation, (Filled or Lines), Rotation, or 'Letter' button to reshape into 'F']
 
 ## Tasks achieved 
 - [x] • Showing two triangles, one simple and the other tessellated, both in line/wireframe drawing style (see below) (10%)
