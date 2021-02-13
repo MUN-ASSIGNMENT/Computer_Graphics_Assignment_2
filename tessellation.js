@@ -1,4 +1,3 @@
-
 var gl;
 var vertices;
 var points;
@@ -6,7 +5,7 @@ var programNormal;
 var programTessellated;
 var colorLocation;
 
-var progTest;
+var progShape;
 var outLine = false;
 var howMnayPoints = 3;
 
@@ -123,11 +122,11 @@ vertices = vecTriangle.slice(0);
 window.onload = init = () => {
   let normalGl = generateCanvasNormal();
   let tessellatedGl = generateCanvasTessellated();
-  let testGl = canvasTest();
-  RadioButton(normalGl, tessellatedGl, testGl);
-  tessellationSlider(normalGl, tessellatedGl, testGl);
-  polygonSlider(normalGl, tessellatedGl, testGl);
-  rotationSlider(normalGl, tessellatedGl, testGl);
+  let shapeGL = canvasShape();
+  RadioButton(normalGl, tessellatedGl);
+  tessellationSlider(normalGl, tessellatedGl);
+  polygonSlider(normalGl, tessellatedGl);
+  rotationSlider(normalGl, tessellatedGl);
 }
 
 // Line or filled listner
@@ -140,14 +139,12 @@ const RadioButton = (gl1, gl2, gl3) => {
     console.log("lines button!", fill);
     recalculate(gl1, programNormal, 0);
     recalculate(gl2, programTessellated, tessellation);
-    verticeToPoints(gl3, progTest, howMnayPoints);
   });
 
   filled.addEventListener("input", () => {
     fill = 1;
     recalculate(gl1, programNormal, 0);
     recalculate(gl2, programTessellated, tessellation);
-    verticeToPoints(gl3, progTest, howMnayPoints);
   });
 };
 
@@ -184,7 +181,6 @@ const polygonSlider = (gl1, gl2, gl3) => {
 
     recalculate(gl1, programNormal, 0);
     recalculate(gl2, programTessellated, tessellation);
-    verticeToPoints(gl3, progTest, howMnayPoints);
   })
 }
 
@@ -199,7 +195,6 @@ const tessellationSlider = (gl1, gl2, gl3) => {
 
     recalculate(gl1, programNormal, 0);
     recalculate(gl2, programTessellated, tessellation);
-    verticeToPoints(gl3, progTest, howMnayPoints);
   })
 }
 
@@ -213,14 +208,13 @@ const rotationSlider = (gl1, gl2, gl3) => {
     rotate = sliderValue;
     recalculate(gl1, programNormal, 0);
     recalculate(gl2, programTessellated, tessellation);
-    verticeToPoints(gl3, progTest, howMnayPoints);
   })
 }
 
-const canvasTest = () => {
-  var canvasTest = document.getElementById("gl-canvas-test");
+const canvasShape = () => {
+  var canvas_shape = document.getElementById("gl-canvas-shape");
   // Initialize the GL context
-  var gl = canvasTest.getContext("webgl2");
+  var gl = canvas_shape.getContext("webgl2");
 
   // Only continue if WebGL is available and working
   if (gl === null) {
@@ -229,16 +223,16 @@ const canvasTest = () => {
   }
 
   //  Configure WebGL
-  gl.viewport(0, 0, canvasTest.width, canvasTest.height);
+  gl.viewport(0, 0, canvas_shape.width, canvas_shape.height);
   gl.clearColor(0.0, 0.0, 0.0, 1.0);
 
   //  Load shaders and initialize attribute buffers
-  progTest = initShaders(gl, "vertex-shader", "fragment-shader");
-  gl.useProgram(progTest);
+  progShape = initShaders(gl, "vertex-shader", "fragment-shader");
+  gl.useProgram(progShape);
 
-  // default situation - triangle when the page is loaded.
-  verticeToPoints(gl, progTest, howMnayPoints);
-  
+  verticeToPoints(gl, progShape)
+  renderStar(gl);
+
   return gl;
 }
 
@@ -291,31 +285,36 @@ const generateCanvasTessellated = () => {
   return gl;
 }
 
-const verticeToPoints = (gl, program, d) => {
-  points = [];// makeShape(d);
+const verticeToPoints = (gl, program) => {
 
-  let tmpV = makeShape(d);
-
-  for (var i = 0; i < tmpV.length; i += 3) {
-    triangle(tmpV[i + 0], tmpV[i + 1], tmpV[i + 2], tessellation, 1);
-  }
-  
   // Load the data into the GPU
   var bufferId = gl.createBuffer();
   // Bind the id buffer here.
   gl.bindBuffer(gl.ARRAY_BUFFER, bufferId);
   // fill the buffer with vertecies
-  gl.bufferData(gl.ARRAY_BUFFER, flatten(points), gl.STATIC_DRAW);
+  let starCoords = star();
+  gl.bufferData(gl.ARRAY_BUFFER, starCoords, gl.STATIC_DRAW);
   var vPosition = gl.getAttribLocation(program, "vPosition");
   gl.vertexAttribPointer(vPosition, 2, gl.FLOAT, false, 0, 0);
   gl.enableVertexAttribArray(vPosition);
 
   // color location 
   colorLocation = gl.getUniformLocation(program, "u_Color");
-
-  render(gl);
 }
 
+const star = () => {
+  coords = new Float32Array(24);
+  k = 0;
+  coords[k++] = 0;
+  coords[k++] = 0;
+  for (var i = 0; i <= 20; i++) {
+    var angle = -Math.PI / 2 + (i / 10) * 2 * Math.PI;
+    var radius = i % 2 == 0 ? 0.5 : 0.2;
+    coords[k++] = radius * Math.cos(angle); 
+    coords[k++] = radius * Math.sin(angle);
+  }
+  return coords;
+}
 const recalculate = (gl, program, tessellated = 0) => {
   points = [];
   // create a tessellated shape
@@ -361,12 +360,19 @@ const render = (gl) => {
   }
 }
 
+const renderStar = (gl) => {
+  gl.clear(gl.COLOR_BUFFER_BIT);
+  var vPosition = gl.getAttribLocation(progShape, "vPosition");
+  gl.vertexAttribPointer(vPosition, 2, gl.FLOAT, false, 0, 0);
+  gl.drawArrays(gl.TRIANGLE_FAN, 0, 12);
+}
+
 // tessellation method
 const triangle = (a, b, c, count, fill) => {
   if (count == 0) {
-      var da = Math.sqrt(Math.pow(a[0], 2) + Math.pow(a[1], 2)) * (rotate * Math.PI / 180.0);
-      var db = Math.sqrt(Math.pow(b[0], 2) + Math.pow(b[1], 2)) * (rotate * Math.PI / 180.0);
-      var dc = Math.sqrt(Math.pow(c[0], 2) + Math.pow(c[1], 2)) * (rotate * Math.PI / 180.0);
+    var da = Math.sqrt(Math.pow(a[0], 2) + Math.pow(a[1], 2)) * (rotate * Math.PI / 180.0);
+    var db = Math.sqrt(Math.pow(b[0], 2) + Math.pow(b[1], 2)) * (rotate * Math.PI / 180.0);
+    var dc = Math.sqrt(Math.pow(c[0], 2) + Math.pow(c[1], 2)) * (rotate * Math.PI / 180.0);
 
     var ap = vec2(
       (a[0] * Math.cos(da)) - (a[1] * Math.sin(da)),
@@ -397,7 +403,7 @@ const triangle = (a, b, c, count, fill) => {
   if (fill == 1 || fill == 2) {
     triangle(ab, ac, bc, (count - 1), fill);
   }
-  
+
 }
 
 // helper func
@@ -406,15 +412,15 @@ function makeShape(d) {
   let p1 = [];
   let rad = Math.PI * 2.0;
 
-  for(let i=0; i<d; i++){
-      let x = 1 * Math.cos(rad/d * i);
-      let y = 1 * Math.sin(rad/d * i);
-      let nextI = i === d-1 ? 0 : i+1;
-      let nextX = 1 * Math.cos(rad/d * nextI);
-      let nextY = 1 * Math.sin(rad/d * nextI);
-      p1.push(vec2(0, 0));
-      p1.push(vec2(x, y));
-      p1.push(vec2(nextX, nextY));
+  for (let i = 0; i < d; i++) {
+    let x = 1 * Math.cos(rad / d * i);
+    let y = 1 * Math.sin(rad / d * i);
+    let nextI = i === d - 1 ? 0 : i + 1;
+    let nextX = 1 * Math.cos(rad / d * nextI);
+    let nextY = 1 * Math.sin(rad / d * nextI);
+    p1.push(vec2(0, 0));
+    p1.push(vec2(x, y));
+    p1.push(vec2(nextX, nextY));
 
   }
 
