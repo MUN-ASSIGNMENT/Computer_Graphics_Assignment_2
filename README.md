@@ -4,6 +4,9 @@
     1. open <index.html> - use Chrome 
     2. adjust [# of polygon sides, Tessellation, (Filled or Lines), Rotation, or 'Letter' button to reshape into 'F']
 
+### +++ In the first row +++ 
+    left canvas: shapes hard-coded, right canvas: shapes created programatically.
+
 ## Tasks achieved 
 - [x] • Showing two triangles, one simple and the other tessellated, both in line/wireframe drawing style (see below) (10%)
 - [x] • Showing two tessellated and twisted triangles, both in filled-color form (10%)
