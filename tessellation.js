@@ -4,6 +4,7 @@ var vertices;
 var points;
 var programNormal;
 var programTessellated;
+var colorLocation;
 
 var progTest;
 var outLine = false;
@@ -115,8 +116,7 @@ var vecOctagon = [
   vec2(0.7071067811865465, -0.70710678118654),
 ]
 
-var vec_octa = makeShape(8);
-
+// default shape - triangle
 vertices = vecTriangle.slice(0);
 
 //render following function onload
@@ -236,13 +236,9 @@ const canvasTest = () => {
   progTest = initShaders(gl, "vertex-shader", "fragment-shader");
   gl.useProgram(progTest);
 
-  // Load the data into the GPU
-  var bufferId = gl.createBuffer();
-  // Bind the id buffer here.
-  gl.bindBuffer(gl.ARRAY_BUFFER, bufferId);
-
   // default situation - triangle when the page is loaded.
   verticeToPoints(gl, progTest, howMnayPoints);
+  
   return gl;
 }
 
@@ -265,16 +261,6 @@ const generateCanvasNormal = () => {
   //  Load shaders and initialize attribute buffers
   programNormal = initShaders(gl, "vertex-shader", "fragment-shader");
   gl.useProgram(programNormal);
-
-  // Load the data into the GPU
-  var bufferId = gl.createBuffer();
-  gl.bindBuffer(gl.ARRAY_BUFFER, bufferId);
-  gl.bufferData(gl.ARRAY_BUFFER, flatten(vertices), gl.STATIC_DRAW);
-
-  // Associate out shader variables with our data buffer
-  var vPosition = gl.getAttribLocation(programNormal, "vPosition");
-  gl.vertexAttribPointer(vPosition, 2, gl.FLOAT, false, 0, 0);
-  gl.enableVertexAttribArray(vPosition);
 
   recalculate(gl, programNormal, 0);
   return gl;
@@ -300,17 +286,7 @@ const generateCanvasTessellated = () => {
   programTessellated = initShaders(gl, "vertex-shader", "fragment-shader");
   gl.useProgram(programTessellated);
 
-  // Load the data into the GPU
-  var bufferId = gl.createBuffer();
-  gl.bindBuffer(gl.ARRAY_BUFFER, bufferId);
-  gl.bufferData(gl.ARRAY_BUFFER, flatten(vertices), gl.STATIC_DRAW);
-
-  // Associate out shader variables with our data buffer
-
-  var vPosition = gl.getAttribLocation(programTessellated, "vPosition");
-  gl.vertexAttribPointer(vPosition, 2, gl.FLOAT, false, 0, 0);
-  gl.enableVertexAttribArray(vPosition);
-
+  // call 
   recalculate(gl, programTessellated, tessellation);
   return gl;
 }
@@ -324,57 +300,68 @@ const verticeToPoints = (gl, program, d) => {
     triangle(tmpV[i + 0], tmpV[i + 1], tmpV[i + 2], tessellation, 1);
   }
   
+  // Load the data into the GPU
+  var bufferId = gl.createBuffer();
+  // Bind the id buffer here.
+  gl.bindBuffer(gl.ARRAY_BUFFER, bufferId);
+  // fill the buffer with vertecies
   gl.bufferData(gl.ARRAY_BUFFER, flatten(points), gl.STATIC_DRAW);
   var vPosition = gl.getAttribLocation(program, "vPosition");
   gl.vertexAttribPointer(vPosition, 2, gl.FLOAT, false, 0, 0);
   gl.enableVertexAttribArray(vPosition);
-  render2(gl);
-}
 
-
-
-const recalculate = (gl, program, tessellated = 0) => {
-  points = [];
-  for (var i = 0; i < vertices.length; i += 3) {
-    triangle(vertices[i + 0], vertices[i + 1], vertices[i + 2], tessellated, 1);
-  }
-
-  gl.bufferData(gl.ARRAY_BUFFER, flatten(points), gl.STATIC_DRAW);
-  var vPosition = gl.getAttribLocation(program, "vPosition");
-  gl.vertexAttribPointer(vPosition, 2, gl.FLOAT, false, 0, 0);
-  gl.enableVertexAttribArray(vPosition);
+  // color location 
+  colorLocation = gl.getUniformLocation(program, "u_Color");
 
   render(gl);
 }
 
-const render2 = (gl) => {
-  gl.clear(gl.COLOR_BUFFER_BIT);
-  if (fill === 2) { // filled in shape
-    for (let i = 0; i < points.length; i += 3){
-      gl.drawArrays(gl.LINE_LOOP, i, 3);
-    }
-  } else { // skeleton shape
-    // coloring test
-    for (let i = 0; i < points.length; i += 3){
-      gl.drawArrays(gl.TRIANGLES, i, 3);
-    }
+const recalculate = (gl, program, tessellated = 0) => {
+  points = [];
+  // create a tessellated shape
+  for (var i = 0; i < vertices.length; i += 3) {
+    triangle(vertices[i + 0], vertices[i + 1], vertices[i + 2], tessellated, 1);
   }
+
+  // Load the data into the GPU
+  var bufferId = gl.createBuffer();
+  // bind to the ARRAY_BUFFER
+  gl.bindBuffer(gl.ARRAY_BUFFER, bufferId);
+  // fill the buffer
+  gl.bufferData(gl.ARRAY_BUFFER, flatten(points), gl.STATIC_DRAW);
+  var vPosition = gl.getAttribLocation(program, "vPosition");
+  gl.vertexAttribPointer(vPosition, 2, gl.FLOAT, false, 0, 0);
+  gl.enableVertexAttribArray(vPosition);
+
+  // color location 
+  colorLocation = gl.getUniformLocation(program, "u_Color");
+
+  render(gl);
 }
 
+// reder funtion 
 const render = (gl) => {
   gl.clear(gl.COLOR_BUFFER_BIT);
   if (fill === 2) {
-    console.log('what?')
     for (let i = 0; i < points.length; i += 3) {
+      // set the color
+      var cc = [Math.random(), Math.random(), Math.random(), 1.0];
+      gl.uniform4fv(colorLocation, cc);
+      // draw
       gl.drawArrays(gl.LINE_LOOP, i, 3);
     }
   } else {
     for (let i = 0; i < points.length; i += 3) {
+      // set the color
+      var cc = [Math.random(), Math.random(), Math.random(), 1.0];
+      gl.uniform4fv(colorLocation, cc);
+      // draw
       gl.drawArrays(gl.TRIANGLES, i, 3);
     }
   }
 }
 
+// tessellation method
 const triangle = (a, b, c, count, fill) => {
   if (count == 0) {
       var da = Math.sqrt(Math.pow(a[0], 2) + Math.pow(a[1], 2)) * (rotate * Math.PI / 180.0);
