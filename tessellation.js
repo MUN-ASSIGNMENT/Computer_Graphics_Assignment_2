@@ -115,6 +115,42 @@ var vecOctagon = [
   vec2(0.7071067811865465, -0.70710678118654),
 ]
 
+// for letter 'F'
+var F = [
+  // left column
+  vec2(0, 0),
+  vec2(30, 0),
+  vec2(0, 150),
+  vec2(0, 150),
+  vec2(30, 0),
+  vec2(30, 150),
+
+  // top rung
+  vec2(30, 0),
+  vec2(100, 0),
+  vec2(30, 30),
+  vec2(30, 30),
+  vec2(100, 0),
+  vec2(100, 30),
+
+  // middle rung
+  vec2(30, 60),
+  vec2(67, 60),
+  vec2(30, 90),
+  vec2(30, 90),
+  vec2(67, 60),
+  vec2(67, 90),
+];
+// convert the F's vertices to Clip Space
+var letter = [];
+F.forEach(f => {
+  console.log(f[0], f[1], "dsa");
+  const tmp = 256;
+  let x = f[0] / tmp * 2.0 - 1.0;
+  let y = (f[1] / tmp * 2.0 - 1.0) * -1;
+  letter.push(vec2(x, y));
+});
+
 // default shape - triangle
 vertices = vecTriangle.slice(0);
 
@@ -133,6 +169,15 @@ window.onload = init = () => {
 const RadioButton = (gl1, gl2, gl3) => {
   const button = document.getElementById("lines"); //lines
   const button1 = document.getElementById("filled"); //filled
+  const buttonLetter = document.getElementById("letter"); //F
+
+  // when the letter button clicked
+  buttonLetter.addEventListener("click", () => {
+    vertices = letter; // set the vertices to 'F'
+    recalculate(gl1, programNormal, 0);
+    recalculate(gl2, programTessellated, tessellation);
+    verticeToPoints(gl3, progTest, howMnayPoints);
+  });
 
   button.addEventListener("input", () => {
     fill = 2;
